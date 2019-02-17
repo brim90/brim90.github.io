@@ -1,3 +1,5 @@
 name: Dan Brimmicombe
 markdown: kramdown
 permalink: /blog/:year/:month/:day/:title
+# Google Analytics
+google_analytics: UA-134678958-1
