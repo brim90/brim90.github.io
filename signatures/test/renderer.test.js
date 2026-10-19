@@ -35,12 +35,14 @@ test('every design renders with no leftover placeholders or comments', () => {
   }
 });
 
-test('signature carries the person and the legal details', () => {
-  const html = render(dan);
-  for (const text of ['Dan Brimmicombe', 'Associate Director of Technology', 'Water Babies Ltd',
-    'Winslade House, Winslade Park, Manor Drive', 'Clyst St Mary, Exeter, EX5 1FY',
-    'Registered in England &amp; Wales No. 04322357']) {
-    assert.ok(html.includes(text), 'missing ' + text);
+test('both versions carry the person and the legal details', () => {
+  for (const variant of ['new', 'reply']) {
+    const html = render(dan, variant);
+    for (const text of ['Dan Brimmicombe', 'Associate Director of Technology',
+      'Water Babies Ltd. Registered in England &amp; Wales No. 04322357',
+      'Registered office: Winslade House, Winslade Park, Manor Drive,', 'Clyst St Mary, Exeter, EX5 1FY']) {
+      assert.ok(html.includes(text), `${variant} is missing ${text}`);
+    }
   }
 });
 
@@ -63,7 +65,6 @@ test('reply signature is short: no images, mobile preferred, legal line kept', (
   assert.ok(!html.includes('<img'));
   assert.ok(html.includes('James Brookes') && html.includes('Managing Director, UK &amp; EU'));
   assert.ok(html.includes('07700 900456') && !html.includes('0330 223 6777'));
-  assert.ok(html.includes('Water Babies Ltd. Registered in England &amp; Wales No. 04322357'));
   assert.ok(render(dan, 'reply').includes('href="tel:03302236777"'), 'switchboard when there is no mobile');
   assert.match(html, /text-decoration:underline;"><span style="color:#FF6600;">waterbabies\.co\.uk/);
 });
