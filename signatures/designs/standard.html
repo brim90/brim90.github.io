@@ -10,7 +10,22 @@
   same in classic Outlook (Word engine), new Outlook, Outlook on the web,
   Outlook mobile, Apple Mail and Gmail. Every image has width and height set.
   Comments like this one are removed before the signature is inserted.
+
+  Dark mode: apps that support it (Apple Mail, Outlook for iOS/Android/Mac,
+  Outlook.com) swap to the white logo and lighten the dark blue text to cyan. Everywhere else, including any app
+  that strips <style>, the white logo stays hidden and the blue logo on its
+  white box shows, as the brand guidelines want.
 -->
+<style>
+  @media (prefers-color-scheme: dark) {
+    .wb-logo-light { display: none !important; }
+    .wb-logo-dark { display: block !important; max-height: none !important; width: 104px !important; height: 74px !important; }
+    .wb-dark-cyan { color: #00B0F0 !important; }
+  }
+  [data-ogsc] .wb-logo-light { display: none !important; }
+  [data-ogsc] .wb-logo-dark { display: block !important; max-height: none !important; width: 104px !important; height: 74px !important; }
+  [data-ogsc] .wb-dark-cyan { color: #00B0F0 !important; }
+</style>
 <table border="0" cellpadding="0" cellspacing="0" width="500" role="presentation" style="border-collapse:collapse;border-spacing:0;mso-table-lspace:0pt;mso-table-rspace:0pt;width:500px;">
   <tr>
     <td width="120" style="width:120px;height:8px;padding:0;font-size:1px;line-height:1px;">&nbsp;</td>
@@ -19,10 +34,10 @@
   </tr>
   <tr>
     <td width="120" valign="top" style="width:120px;padding:4px 8px;vertical-align:top;">
-      <a href="{{company.website}}" target="_blank" style="text-decoration:none;"><img src="{{assets}}/logo.png" alt="Water Babies - learn for life" width="104" height="74" style="display:block;width:104px;height:74px;border:0;"></a>
+      <a href="{{company.website}}" target="_blank" style="text-decoration:none;"><img class="wb-logo-light" src="{{assets}}/logo.png" alt="Water Babies - learn for life" width="104" height="74" style="display:block;width:104px;height:74px;border:0;"><img class="wb-logo-dark" src="{{assets}}/logo-white.png" alt="Water Babies - learn for life" width="104" height="74" style="display:none;width:0;height:0;max-height:0;overflow:hidden;mso-hide:all;border:0;"></a>
     </td>
     <td width="200" valign="top" style="width:200px;padding:4px 8px;vertical-align:top;">
-      <p style="margin:6px 0 2px 0;padding:0;font-family:Arial,Helvetica,sans-serif;font-size:14pt;line-height:16pt;mso-line-height-rule:exactly;color:#0070C0;"><strong>{{user.displayName}}</strong></p>
+      <p class="wb-dark-cyan" style="margin:6px 0 2px 0;padding:0;font-family:Arial,Helvetica,sans-serif;font-size:14pt;line-height:16pt;mso-line-height-rule:exactly;color:#0070C0;"><strong>{{user.displayName}}</strong></p>
       {{#user.jobTitle}}<p style="margin:0;padding:0;font-family:Arial,Helvetica,sans-serif;font-size:10pt;line-height:14pt;mso-line-height-rule:exactly;color:#00B0F0;">{{user.jobTitle}}</p>{{/user.jobTitle}}
     </td>
     <td width="180" valign="top" align="center" bgcolor="#E5F4F8" style="width:180px;padding:4px 8px;vertical-align:top;background-color:#E5F4F8;text-align:center;">
@@ -33,7 +48,7 @@
   </tr>
   <tr>
     <td colspan="2" valign="bottom" style="padding:2px 8px 4px 8px;vertical-align:bottom;">
-      <p style="margin:0;padding:0;font-family:Arial,Helvetica,sans-serif;font-size:7pt;line-height:9pt;mso-line-height-rule:exactly;color:#0070C0;">{{company.name}}. Registered in {{company.registeredIn}} No. {{company.number}}<br>Registered office: {{company.addressLine1}},<br>{{company.addressLine2}}</p>
+      <p class="wb-dark-cyan" style="margin:0;padding:0;font-family:Arial,Helvetica,sans-serif;font-size:7pt;line-height:9pt;mso-line-height-rule:exactly;color:#0070C0;">{{company.name}}. Registered in {{company.registeredIn}} No. {{company.number}}<br>Registered office: {{company.addressLine1}},<br>{{company.addressLine2}}</p>
     </td>
     <td valign="bottom" align="center" bgcolor="#E5F4F8" style="padding:2px 8px 6px 8px;vertical-align:bottom;background-color:#E5F4F8;text-align:center;">
       <img src="{{assets}}/icons.png" alt="" width="94" height="26" style="width:94px;height:26px;border:0;">

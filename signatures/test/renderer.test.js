@@ -76,7 +76,7 @@ test('designs without a reply version use the full one', () => {
 
 test('every image has absolute src, width and height (needed by Outlook desktop)', () => {
   const imgs = render(dan).match(/<img [^>]*>/g);
-  assert.strictEqual(imgs.length, 2, 'keep the image count low: logo and icon strip');
+  assert.strictEqual(imgs.length, 3, 'keep the image count low: logo, dark-mode logo, icon strip');
   for (const img of imgs) {
     assert.match(img, new RegExp('src="' + ASSETS + '/[\\w-]+\\.png"'));
     assert.match(img, / width="\d+"/);
@@ -97,4 +97,14 @@ test('rules pick a design, first match wins, otherwise the default', () => {
   assert.strictEqual(R.chooseDesign(cfg, R.buildUser({ department: 'franchise support' })), 'other');
   assert.strictEqual(R.chooseDesign(cfg, R.buildUser({ department: 'Finance' })), config.defaultDesign);
   assert.throws(() => R.renderSignature(cfg, designs, { department: 'Franchise Support' }, ASSETS), /not listed/);
+});
+
+test('white logo is hidden unless the app supports dark mode', () => {
+  const html = render(dan);
+  const dark = html.match(/<img class="wb-logo-dark"[^>]*>/)[0];
+  assert.match(dark, /display:none;/);
+  assert.match(dark, /mso-hide:all;/, 'classic Outlook must never show it');
+  assert.match(dark, /logo-white\.png/);
+  assert.match(html, /<img class="wb-logo-light"[^>]*style="display:block;/);
+  assert.match(html, /@media \(prefers-color-scheme: dark\)/);
 });

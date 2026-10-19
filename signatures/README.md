@@ -22,7 +22,7 @@ Microsoft 365 profile ──► Outlook add-in ──► signature inserted when
 |---|---|
 | Company name, number, address, switchboard, website | `signatures.json` > `company` |
 | The design | `designs/standard.html` (new emails) and `designs/standard-reply.html` (replies and forwards) |
-| Logo and icons | `assets/logo.png` (208×148, shown at 104×74) and `assets/icons.png` (188×52, shown at 94×26). Replace them with same-size exports, keeping the file names. |
+| Logo and icons | `assets/logo.png` and `assets/logo-white.png` (208×148, shown at 104×74), and `assets/icons.png` (188×52, shown at 94×26). Replace them with same-size exports, keeping the file names. |
 | Someone's name, job title or numbers | Their Microsoft 365 profile (Entra ID) |
 
 The design follows the *Water Babies Email Signature 2026* guide: 500px wide, three columns,
@@ -43,6 +43,9 @@ Where it deliberately differs from the guide, for better display and delivery:
 - **Readable legal text:** 7pt in brand blue instead of 4.5pt cyan, with the company number and
   registered office (a legal requirement for UK company emails).
 - **An underlined website link.**
+- **Dark mode:** apps that support it (Apple Mail, Outlook for iOS/Android/Mac, Outlook.com)
+  switch to `assets/logo-white.png` and lighten the dark blue text. Every other app, including
+  classic Outlook for Windows and Gmail, shows the blue logo on its white box.
 
 Rules applied to everyone:
 - **T:** is their own office number from Microsoft 365, or the 0330 223 6777 switchboard if they
