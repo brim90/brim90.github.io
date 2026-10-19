@@ -28,10 +28,11 @@
   <main>
     <div>
       <h1>Water Babies signature preview</h1>
-      <p>Shows the signature exactly as the Outlook add-in inserts it. Type any details to check how it copes with long titles or missing numbers.</p>
+      <p>Shows the signature exactly as the Outlook add-in inserts it: the full version on new emails, the short one on replies and forwards. Type any details to check how it copes with long titles or missing numbers.</p>
     </div>
     <div class="panel fields">
       <label>Design <select id="design"></select></label>
+      <label>Email <select id="variant"><option value="new">New email</option><option value="reply">Reply / forward</option></select></label>
       <label>Name <input id="name" value="Dan Brimmicombe"></label>
       <label>Job title <input id="title" value="Associate Director of Technology"></label>
       <label>Office phone <input id="phone" placeholder="switchboard"></label>

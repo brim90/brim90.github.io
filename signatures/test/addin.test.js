@@ -9,7 +9,7 @@ const vm = require('node:vm');
 const root = path.join(__dirname, '..');
 const bundle = fs.readFileSync(path.join(root, 'addin', 'launchevent.js'), 'utf8');
 
-function loadAddin({ serverUp = true, mobile = false } = {}) {
+function loadAddin({ serverUp = true, mobile = false, composeType = 'newMail' } = {}) {
   const handlers = {};
   const calls = { signature: null, disabled: false, completed: 0, fetches: [] };
   const store = new Map();
@@ -18,7 +18,10 @@ function loadAddin({ serverUp = true, mobile = false } = {}) {
     body: { setSignatureAsync: (html, opts, cb) => { calls.signature = { html, opts }; cb(ok()); } }
   };
   // Outlook mobile may not offer every 1.10 API; the add-in must cope.
-  if (!mobile) item.disableClientSignatureAsync = (cb) => { calls.disabled = true; cb(ok()); };
+  if (!mobile) {
+    item.disableClientSignatureAsync = (cb) => { calls.disabled = true; cb(ok()); };
+    item.getComposeTypeAsync = (cb) => cb(ok({ composeType, coercionType: 'html' }));
+  }
   const Office = {
     AsyncResultStatus: { Succeeded: 'succeeded', Failed: 'failed' },
     CoercionType: { Html: 'html' },
@@ -56,10 +59,20 @@ test('inserts the signature and turns off Outlook\'s own one', async () => {
   assert.ok(calls.signature.html.includes('https://danbrimmicombe.co.uk/signatures/assets/logo.png'));
 });
 
-test('works when disableClientSignatureAsync is unavailable (mobile)', async () => {
+test('replies and forwards get the short signature', async () => {
+  for (const composeType of ['reply', 'forward']) {
+    const { run, calls } = loadAddin({ composeType });
+    await run();
+    assert.ok(calls.signature.html.includes('Dan Brimmicombe'));
+    assert.ok(!calls.signature.html.includes('<img'), composeType + ' should be the short version');
+  }
+});
+
+test('works when the 1.10 APIs are unavailable (mobile), using the full signature', async () => {
   const { run, calls } = loadAddin({ mobile: true });
   await run();
   assert.ok(calls.signature.html.includes('Dan Brimmicombe'));
+  assert.ok(calls.signature.html.includes('logo.png'));
 });
 
 test('always completes the event, even when the site is down', async () => {

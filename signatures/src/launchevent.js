@@ -1,6 +1,7 @@
 /*
  * Outlook add-in: inserts the Water Babies signature whenever someone starts
- * a new email, reply or forward, filled in from their Microsoft 365 profile.
+ * a new email (full signature) or a reply/forward (short signature), filled
+ * in from their Microsoft 365 profile.
  *
  * Runs in commands.html (Outlook on the web, new Outlook, Outlook for Mac,
  * Outlook for iOS and Android) and as a plain script in classic Outlook for
@@ -78,7 +79,10 @@ function loadDesigns() {
   return cached('signature.designs', async () => {
     const signatureConfig = JSON.parse(await fetchText('signatures.json'));
     const designs = {};
-    for (const [name, path] of Object.entries(signatureConfig.designs)) designs[name] = await fetchText(path);
+    for (const [name, files] of Object.entries(signatureConfig.designs)) {
+      designs[name] = { new: await fetchText(files.new) };
+      if (files.reply) designs[name].reply = await fetchText(files.reply);
+    }
     return { config: signatureConfig, designs };
   });
 }
@@ -121,10 +125,23 @@ function officeCall(fn) {
   });
 }
 
+// "reply" for replies and forwards. Falls back to the full signature where
+// Outlook can't say (getComposeTypeAsync isn't available everywhere).
+async function getVariant(item) {
+  if (!item.getComposeTypeAsync) return 'new';
+  try {
+    const { composeType } = await officeCall((cb) => item.getComposeTypeAsync(cb));
+    return composeType === 'reply' || composeType === 'forward' ? 'reply' : 'new';
+  } catch (e) {
+    return 'new';
+  }
+}
+
 async function applySignature() {
   const item = Office.context.mailbox.item;
-  const [{ config: signatureConfig, designs }, profile] = await Promise.all([loadDesigns(), loadProfile()]);
-  const { html } = SignatureRenderer.renderSignature(signatureConfig, designs, profile, config.baseUrl + '/assets');
+  const [{ config: signatureConfig, designs }, profile, variant] =
+    await Promise.all([loadDesigns(), loadProfile(), getVariant(item)]);
+  const { html } = SignatureRenderer.renderSignature(signatureConfig, designs, profile, config.baseUrl + '/assets', variant);
   // Stop Outlook adding the person's own signature as well as ours.
   if (item.disableClientSignatureAsync) {
     await officeCall((cb) => item.disableClientSignatureAsync(cb)).catch((e) => console.warn(e));

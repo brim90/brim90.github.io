@@ -4,7 +4,8 @@ Puts the Water Babies signature on every email sent from Outlook, filled in from
 Microsoft 365 profile. It replaces Exclaimer/CodeTwo for one job only: rolling out this signature.
 
 It works in classic Outlook for Windows, new Outlook, Outlook for Mac, Outlook on the web, and
-Outlook for iOS and Android. It covers new emails, replies and forwards.
+Outlook for iOS and Android. New emails get the full signature. Replies and forwards get a short,
+text-only version, so long threads aren't full of repeated logos.
 
 ## How it works
 
@@ -20,7 +21,7 @@ Microsoft 365 profile ──► Outlook add-in ──► signature inserted when
 | What you change | Where |
 |---|---|
 | Company name, number, address, switchboard, website | `signatures.json` > `company` |
-| The design | `designs/standard.html` |
+| The design | `designs/standard.html` (new emails) and `designs/standard-reply.html` (replies and forwards) |
 | Logo and icons | `assets/` |
 | Someone's name, job title or numbers | Their Microsoft 365 profile (Entra ID) |
 
@@ -44,10 +45,12 @@ numbers to test with. **Copy signature** lets you paste it into a real Outlook e
 
 ## Changing or adding designs
 
-- **Change the design:** edit `designs/standard.html`, check it in the preview, commit. Outlook
+- **Change the design:** edit `designs/standard.html` or `designs/standard-reply.html`, check it in
+  the preview, commit. Outlook
   picks it up within an hour (`cacheMinutes` in `src/config.js`).
 - **Add another design**, for example for franchisees or another country:
-  1. Copy `designs/standard.html` to `designs/franchise.html` and edit it.
+  1. Copy `designs/standard.html` to `designs/franchise.html` and edit it. A reply version is
+     optional: without one, replies get the full signature.
   2. List it in `signatures.json`, and add a rule saying who gets it. The first matching rule wins.
      Everyone else gets `defaultDesign`.
 
@@ -56,8 +59,8 @@ numbers to test with. **Copy signature** lets you paste it into a real Outlook e
        { "design": "franchise", "when": { "department": ["Franchise Support"] } }
      ],
      "designs": {
-       "standard": "designs/standard.html",
-       "franchise": "designs/franchise.html"
+       "standard": { "new": "designs/standard.html", "reply": "designs/standard-reply.html" },
+       "franchise": { "new": "designs/franchise.html" }
      }
      ```
 
@@ -112,6 +115,7 @@ If you'd rather host it on a Water Babies domain such as `signatures.waterbabies
    - [ ] New Outlook for Windows / Outlook on the web
    - [ ] Outlook for Mac
    - [ ] Outlook for iOS and Android (new email, reply)
+   - [ ] Replies and forwards get the short version everywhere
    - [ ] Someone with a mobile, someone without, and someone with a long job title
    - [ ] What recipients see in Outlook, Gmail and the iPhone Mail app, including dark mode
 4. Ask pilot users to delete their old personal signature. The add-in switches it off per email
@@ -126,6 +130,7 @@ If you'd rather host it on a Water Babies domain such as `signatures.waterbabies
   where to confirm it. If it fails, the signature still goes in, with only the person's name.
   Check that job titles appear for pilot users on classic Outlook.
 - **Mobile:** Outlook for iOS/Android runs the add-in when an email is started, but the 500px
-  signature is scaled down to fit the phone screen, as the guide's own signature is today.
+  signature is scaled down to fit the phone screen, as the guide's own signature is today. If the
+  app can't tell the add-in whether the email is a reply, it uses the full signature.
 - **Editing a draft** doesn't re-insert the signature (Outlook doesn't fire the event for drafts).
 - **Email sent from outside Outlook** (CRM, scanners, other mail apps) won't get the signature.

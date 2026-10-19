@@ -17,8 +17,9 @@ function profileFromForm() {
 }
 
 function render() {
-  const design = $('design').value;
-  const html = SignatureRenderer.renderString(designs[design], {
+  const design = designs[$('design').value];
+  const template = ($('variant').value === 'reply' && design.reply) || design.new;
+  const html = SignatureRenderer.renderString(template, {
     user: SignatureRenderer.buildUser(profileFromForm(), signatureConfig.company),
     company: signatureConfig.company,
     assets: new URL('assets', location.href).href
@@ -44,11 +45,12 @@ async function copySignature() {
 
 async function init() {
   signatureConfig = await (await fetch('signatures.json', { cache: 'no-store' })).json();
-  for (const [name, path] of Object.entries(signatureConfig.designs)) {
-    designs[name] = await (await fetch(path, { cache: 'no-store' })).text();
+  const load = async (path) => (await fetch(path, { cache: 'no-store' })).text();
+  for (const [name, files] of Object.entries(signatureConfig.designs)) {
+    designs[name] = { new: await load(files.new), reply: files.reply ? await load(files.reply) : null };
     $('design').append(new Option(name, name, name === signatureConfig.defaultDesign, name === signatureConfig.defaultDesign));
   }
-  for (const id of ['design', 'name', 'title', 'phone', 'mobile']) $(id).addEventListener('input', render);
+  for (const id of ['design', 'variant', 'name', 'title', 'phone', 'mobile']) $(id).addEventListener('input', render);
   $('copy').addEventListener('click', copySignature);
   render();
 }

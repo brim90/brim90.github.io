@@ -12,6 +12,9 @@
   "defaultDesign": "standard",
   "rules": [],
   "designs": {
-    "standard": "designs/standard.html"
+    "standard": {
+      "new": "designs/standard.html",
+      "reply": "designs/standard-reply.html"
+    }
   }
 }

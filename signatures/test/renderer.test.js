@@ -6,10 +6,11 @@ const R = require('../src/renderer');
 
 const root = path.join(__dirname, '..');
 const config = JSON.parse(fs.readFileSync(path.join(root, 'signatures.json'), 'utf8'));
+const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');
 const designs = Object.fromEntries(Object.entries(config.designs)
-  .map(([name, file]) => [name, fs.readFileSync(path.join(root, file), 'utf8')]));
+  .map(([name, files]) => [name, { new: read(files.new), reply: files.reply && read(files.reply) }]));
 const ASSETS = 'https://example.org/signatures/assets';
-const render = (profile) => R.renderSignature(config, designs, profile, ASSETS).html;
+const render = (profile, variant) => R.renderSignature(config, designs, profile, ASSETS, variant).html;
 
 const dan = { displayName: 'Dan Brimmicombe', jobTitle: 'Associate Director of Technology', mail: 'dan@waterbabies.co.uk' };
 const james = { displayName: 'James Brookes', jobTitle: 'Managing Director, UK & EU', mobilePhone: '07700 900456', mail: 'james@waterbabies.co.uk' };
@@ -24,10 +25,13 @@ test('broken designs fail loudly', () => {
 });
 
 test('every design renders with no leftover placeholders or comments', () => {
-  for (const name of Object.keys(designs)) {
-    const html = R.renderString(designs[name], { user: R.buildUser(james, config.company), company: config.company, assets: ASSETS });
-    assert.ok(!html.includes('{{'), name + ' has an unrendered placeholder');
-    assert.ok(!html.includes('<!--'), name + ' still contains a comment');
+  for (const [name, files] of Object.entries(designs)) {
+    for (const [variant, template] of Object.entries(files)) {
+      if (!template) continue;
+      const html = R.renderString(template, { user: R.buildUser(james, config.company), company: config.company, assets: ASSETS });
+      assert.ok(!html.includes('{{'), `${name} (${variant}) has an unrendered placeholder`);
+      assert.ok(!html.includes('<!--'), `${name} (${variant}) still contains a comment`);
+    }
   }
 });
 
@@ -52,6 +56,21 @@ test('switchboard is used when there is no office number; mobile only when set',
 
 test('website is an underlined link', () => {
   assert.match(render(dan), /<a href="https:\/\/www\.waterbabies\.co\.uk" target="_blank" style="color:#FF6600;text-decoration:underline;">/);
+});
+
+test('reply signature is short: no images, mobile preferred, legal line kept', () => {
+  const html = render(james, 'reply');
+  assert.ok(!html.includes('<img'));
+  assert.ok(html.includes('James Brookes') && html.includes('Managing Director, UK &amp; EU'));
+  assert.ok(html.includes('07700 900456') && !html.includes('0330 223 6777'));
+  assert.ok(html.includes('Water Babies Ltd. Registered in England &amp; Wales No. 04322357'));
+  assert.ok(render(dan, 'reply').includes('href="tel:03302236777"'), 'switchboard when there is no mobile');
+  assert.match(html, /text-decoration:underline;"><span style="color:#FF6600;">waterbabies\.co\.uk/);
+});
+
+test('designs without a reply version use the full one', () => {
+  const only = { standard: { new: designs.standard.new } };
+  assert.strictEqual(R.renderSignature(config, only, dan, ASSETS, 'reply').html, render(dan, 'new'));
 });
 
 test('every image has absolute src, width and height (needed by Outlook desktop)', () => {

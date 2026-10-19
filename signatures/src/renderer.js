@@ -129,14 +129,16 @@ function chooseDesign(config, user) {
 
 /**
  * config:  parsed signatures.json
- * designs: { designName: designHtml }
+ * designs: { designName: { new: html, reply: html } } (reply is optional)
  * assets:  URL of the assets folder the images are served from
+ * variant: "new" for a new email, "reply" for replies and forwards
  */
-function renderSignature(config, designs, profile, assets) {
+function renderSignature(config, designs, profile, assets, variant) {
   const user = buildUser(profile, config.company);
   const design = chooseDesign(config, user);
   if (!designs[design]) throw new Error(`Design "${design}" is not listed in signatures.json`);
-  const html = renderString(designs[design], { user, company: config.company, assets });
+  const template = (variant === 'reply' && designs[design].reply) || designs[design].new;
+  const html = renderString(template, { user, company: config.company, assets });
   return { design, html };
 }
 
