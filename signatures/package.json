@@ -1,0 +1,14 @@
+{
+  "name": "signature-manager",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Centrally managed Outlook email signatures driven by Microsoft 365 / Entra ID profile data",
+  "scripts": {
+    "build": "node build.mjs",
+    "test": "node --test test/*.test.js"
+  },
+  "devDependencies": {
+    "@azure/msal-browser": "^5.25.1",
+    "esbuild": "^0.28.2"
+  }
+}

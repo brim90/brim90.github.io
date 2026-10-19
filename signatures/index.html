@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Signature Manager</title>
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+  <header class="topbar">
+    <h1>Signature Manager</h1>
+    <div class="actions">
+      <button id="reload" type="button" hidden>Reload staff</button>
+      <button id="signin" type="button" class="primary">Sign in with Microsoft 365</button>
+    </div>
+  </header>
+  <p id="status" class="status" role="status"></p>
+
+  <main class="layout">
+    <section class="panel people" aria-labelledby="people-heading">
+      <h2 id="people-heading">People</h2>
+      <input id="search" type="search" placeholder="Search name, team or job title" aria-label="Search people">
+      <p id="user-count" class="note"></p>
+      <ul id="user-list" class="user-list"></ul>
+    </section>
+
+    <section class="panel preview-panel" aria-labelledby="preview-heading">
+      <div class="panel-head">
+        <h2 id="preview-heading">Preview</h2>
+        <label>Compose
+          <select id="variant">
+            <option value="new">New email</option>
+            <option value="reply">Reply / forward / meeting</option>
+          </select>
+        </label>
+        <label>As on <input id="preview-date" type="date"></label>
+      </div>
+      <iframe id="preview" title="Signature preview" sandbox=""></iframe>
+      <p id="missing" class="note"></p>
+      <div class="actions">
+        <button id="copy" type="button">Copy signature</button>
+        <button id="export-all" type="button">Export all (for PowerShell push)</button>
+        <button id="export-gaps" type="button">Download data gaps (CSV)</button>
+      </div>
+      <details>
+        <summary>Rendered HTML</summary>
+        <textarea id="html-output" readonly rows="8" aria-label="Rendered HTML"></textarea>
+      </details>
+    </section>
+
+    <section class="panel editor" aria-labelledby="editor-heading">
+      <div class="panel-head">
+        <h2 id="editor-heading">Template</h2>
+        <button id="download-template" type="button" class="primary">Download template.json</button>
+      </div>
+      <p class="note">Changes preview instantly. To roll out, download template.json and commit it to the
+        <code>signatures</code> folder &mdash; every Outlook client picks it up within the cache window.</p>
+      <h3>Brand</h3>
+      <div id="brand-form" class="brand-form"></div>
+      <h3>Full template (JSON)</h3>
+      <p class="note">Placeholders: <code>{{user.displayName}}</code>, <code>{{user.jobTitle}}</code>,
+        <code>{{user.department}}</code>, <code>{{user.phone}}</code>, <code>{{user.mobilePhone}}</code>,
+        <code>{{user.email}}</code>, <code>{{user.address}}</code>, <code>{{user.pronouns}}</code>, plus
+        <code>{{#field}}…{{/field}}</code> to hide a line when the field is empty.</p>
+      <p id="template-error" class="error" role="alert"></p>
+      <textarea id="template-json" rows="24" spellcheck="false" aria-label="Template JSON"></textarea>
+    </section>
+  </main>
+  <script src="dist/admin.js"></script>
+</body>
+</html>

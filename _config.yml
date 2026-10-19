@@ -3,3 +3,17 @@ markdown: kramdown
 permalink: /blog/:year/:month/:day/:title
 # Google Analytics
 google_analytics: UA-134678958-1
+
+# Signature Manager: publish only the built app, not its sources or tooling.
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor
+  - signatures/node_modules
+  - signatures/src
+  - signatures/test
+  - signatures/build.mjs
+  - signatures/package.json
+  - signatures/package-lock.json
+  - signatures/README.md

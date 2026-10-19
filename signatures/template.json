@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "name": "Children's Alliance standard signature",
+  "brand": {
+    "name": "Children's Alliance",
+    "website": "https://www.childrensalliance.org.uk",
+    "websiteLabel": "childrensalliance.org.uk",
+    "logoUrl": "https://danbrimmicombe.co.uk/signatures/assets/logo.png",
+    "logoWidth": 120,
+    "logoAlt": "Children's Alliance",
+    "primaryColor": "#5B2C83",
+    "accentColor": "#F7A823",
+    "textColor": "#333333",
+    "mutedColor": "#777777",
+    "fontFamily": "Arial, Helvetica, sans-serif",
+    "socials": [
+      { "label": "LinkedIn", "url": "https://www.linkedin.com/company/childrens-alliance" },
+      { "label": "Instagram", "url": "https://www.instagram.com/childrensalliance" },
+      { "label": "Facebook", "url": "https://www.facebook.com/childrensalliance" }
+    ],
+    "legal": "Children's Alliance is a registered charity in England and Wales. This email and any attachments are confidential and intended solely for the addressee. If you have received it in error, please tell the sender and delete it."
+  },
+  "fieldMap": {
+    "pronouns": "onPremisesExtensionAttributes.extensionAttribute1"
+  },
+  "defaults": {
+    "phone": ""
+  },
+  "campaigns": [
+    {
+      "name": "Example banner (disabled)",
+      "enabled": false,
+      "imageUrl": "https://danbrimmicombe.co.uk/signatures/assets/banner.png",
+      "imageWidth": 500,
+      "alt": "Find out about our latest appeal",
+      "link": "https://www.childrensalliance.org.uk",
+      "start": "2026-11-01",
+      "end": "2026-12-31",
+      "departments": []
+    }
+  ],
+  "html": "<table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:collapse;font-family:{{brand.fontFamily}};font-size:13px;line-height:18px;color:{{brand.textColor}};\"><tr><td valign=\"top\" style=\"padding:0 16px 0 0;border-right:3px solid {{brand.accentColor}};\"><a href=\"{{brand.website}}\" style=\"text-decoration:none;\"><img src=\"{{brand.logoUrl}}\" width=\"{{brand.logoWidth}}\" alt=\"{{brand.logoAlt}}\" style=\"display:block;border:0;width:{{brand.logoWidth}}px;height:auto;\"></a></td><td valign=\"top\" style=\"padding:0 0 0 16px;\"><div style=\"font-size:16px;line-height:20px;font-weight:bold;color:{{brand.primaryColor}};\">{{user.displayName}}{{#user.pronouns}} <span style=\"font-size:12px;font-weight:normal;color:{{brand.mutedColor}};\">({{user.pronouns}})</span>{{/user.pronouns}}</div>{{#user.jobTitle}}<div style=\"font-weight:bold;\">{{user.jobTitle}}</div>{{/user.jobTitle}}{{#user.department}}<div style=\"color:{{brand.mutedColor}};\">{{user.department}}</div>{{/user.department}}<div style=\"padding-top:6px;\">{{#user.phone}}<span style=\"color:{{brand.primaryColor}};font-weight:bold;\">T</span>&nbsp;<a href=\"{{user.phoneHref}}\" style=\"color:{{brand.textColor}};text-decoration:none;\">{{user.phone}}</a>{{#user.mobilePhone}}&nbsp;&nbsp;{{/user.mobilePhone}}{{/user.phone}}{{#user.mobilePhone}}<span style=\"color:{{brand.primaryColor}};font-weight:bold;\">M</span>&nbsp;<a href=\"{{user.mobilePhoneHref}}\" style=\"color:{{brand.textColor}};text-decoration:none;\">{{user.mobilePhone}}</a>{{/user.mobilePhone}}</div><div><span style=\"color:{{brand.primaryColor}};font-weight:bold;\">E</span>&nbsp;<a href=\"{{user.emailHref}}\" style=\"color:{{brand.textColor}};text-decoration:none;\">{{user.email}}</a></div><div><span style=\"color:{{brand.primaryColor}};font-weight:bold;\">W</span>&nbsp;<a href=\"{{brand.website}}\" style=\"color:{{brand.primaryColor}};text-decoration:none;font-weight:bold;\">{{brand.websiteLabel}}</a></div>{{#user.address}}<div style=\"color:{{brand.mutedColor}};font-size:12px;\">{{user.address}}</div>{{/user.address}}{{#brand.socials}}<span style=\"font-size:12px;\"><a href=\"{{url}}\" style=\"color:{{brand.primaryColor}};text-decoration:none;\">{{label}}</a>&nbsp;&nbsp;</span>{{/brand.socials}}</td></tr>{{#campaign}}<tr><td colspan=\"2\" style=\"padding:12px 0 0 0;\"><a href=\"{{link}}\" style=\"text-decoration:none;\"><img src=\"{{imageUrl}}\" width=\"{{imageWidth}}\" alt=\"{{alt}}\" style=\"display:block;border:0;width:{{imageWidth}}px;max-width:100%;height:auto;\"></a></td></tr>{{/campaign}}<tr><td colspan=\"2\" style=\"padding:12px 0 0 0;font-size:10px;line-height:13px;color:{{brand.mutedColor}};\">{{brand.legal}}</td></tr></table>",
+  "replyHtml": "<table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:collapse;font-family:{{brand.fontFamily}};font-size:13px;line-height:18px;color:{{brand.textColor}};\"><tr><td style=\"border-left:3px solid {{brand.accentColor}};padding:0 0 0 10px;\"><span style=\"font-weight:bold;color:{{brand.primaryColor}};\">{{user.displayName}}</span>{{#user.jobTitle}} | {{user.jobTitle}}{{/user.jobTitle}}<br>{{brand.name}}{{#user.phone}} | <a href=\"{{user.phoneHref}}\" style=\"color:{{brand.textColor}};text-decoration:none;\">{{user.phone}}</a>{{/user.phone}}</td></tr></table>"
+}
