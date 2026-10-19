@@ -1,11 +1,10 @@
 /*
- * Outlook event-based add-in: inserts the organisation's signature whenever a
- * message or meeting is composed, using the sender's Microsoft 365 profile.
+ * Outlook add-in: inserts the Water Babies signature whenever someone starts
+ * a new email, reply or forward, filled in from their Microsoft 365 profile.
  *
- * Runs in two places:
- *   - commands.html (Outlook on the web, new Outlook, Outlook on Mac)
- *   - directly as a JS file in classic Outlook on Windows, where there is no
- *     DOM, no window.location and no localStorage.
+ * Runs in commands.html (Outlook on the web, new Outlook, Outlook for Mac,
+ * Outlook for iOS and Android) and as a plain script in classic Outlook for
+ * Windows, which has no DOM, no page URL and no localStorage.
  */
 /* global Office, OfficeRuntime */
 const { createNestablePublicClientApplication } = require('@azure/msal-browser');
@@ -52,13 +51,11 @@ function withTimeout(promise, ms) {
   ]);
 }
 
-// Returns a fresh value from `load`, or the cached copy if loading fails.
-// A cached copy younger than cacheMinutes is used without touching the network
-// unless `refresh` is set.
-async function cached(key, load, refresh) {
+// Returns a cached copy younger than cacheMinutes, otherwise loads a fresh
+// one, falling back to the stale copy if loading fails (e.g. offline).
+async function cached(key, load) {
   const entry = await storage.get(key);
-  const maxAge = config.cacheMinutes * 60 * 1000;
-  if (!refresh && entry && Date.now() - entry.savedAt < maxAge) return entry.value;
+  if (entry && Date.now() - entry.savedAt < config.cacheMinutes * 60 * 1000) return entry.value;
   try {
     const value = await withTimeout(load(), NETWORK_TIMEOUT_MS);
     await storage.set(key, { savedAt: Date.now(), value });
@@ -70,47 +67,46 @@ async function cached(key, load, refresh) {
   }
 }
 
-async function loadTemplate(refresh) {
-  return cached('signature.template', async () => {
-    const res = await fetch(config.baseUrl + '/template.json?t=' + Date.now(), { cache: 'no-store' });
-    if (!res.ok) throw new Error('Template download failed: HTTP ' + res.status);
-    return res.json();
-  }, refresh);
+async function fetchText(path) {
+  const res = await fetch(config.baseUrl + '/' + path + '?t=' + Date.now(), { cache: 'no-store' });
+  if (!res.ok) throw new Error('Downloading ' + path + ' failed: HTTP ' + res.status);
+  return res.text();
+}
+
+// signatures.json plus the HTML of every design it lists.
+function loadDesigns() {
+  return cached('signature.designs', async () => {
+    const signatureConfig = JSON.parse(await fetchText('signatures.json'));
+    const designs = {};
+    for (const [name, path] of Object.entries(signatureConfig.designs)) designs[name] = await fetchText(path);
+    return { config: signatureConfig, designs };
+  });
 }
 
 let pcaPromise;
-function getPca() {
+async function fetchGraphProfile() {
   if (!pcaPromise) {
     pcaPromise = createNestablePublicClientApplication({
-      auth: {
-        clientId: config.clientId,
-        authority: 'https://login.microsoftonline.com/' + config.tenantId
-      }
+      auth: { clientId: config.clientId, authority: 'https://login.microsoftonline.com/' + config.tenantId }
     });
   }
-  return pcaPromise;
-}
-
-async function fetchGraphProfile() {
-  const pca = await getPca();
+  const pca = await pcaPromise;
   const request = { scopes: ['User.Read'] };
   const account = pca.getActiveAccount() || pca.getAllAccounts()[0];
   if (account) request.account = account;
-  // Event-based add-ins cannot show sign-in UI, so only silent auth is possible.
-  // Tenant-wide admin consent for User.Read makes this succeed for everyone.
+  // Add-ins can't show a sign-in prompt here, so this relies on admin consent.
   const token = await pca.acquireTokenSilent(request);
   const res = await fetch(GRAPH_ME, { headers: { Authorization: 'Bearer ' + token.accessToken } });
-  if (!res.ok) throw new Error('Graph /me failed: HTTP ' + res.status);
+  if (!res.ok) throw new Error('Microsoft Graph /me failed: HTTP ' + res.status);
   return res.json();
 }
 
-async function loadProfile(refresh) {
+async function loadProfile() {
   const mailboxUser = Office.context.mailbox.userProfile;
-  const cacheKey = 'signature.profile.' + mailboxUser.emailAddress.toLowerCase();
   try {
-    return await cached(cacheKey, fetchGraphProfile, refresh);
+    return await cached('signature.profile.' + mailboxUser.emailAddress.toLowerCase(), fetchGraphProfile);
   } catch (e) {
-    // Last resort: the two fields Outlook always knows about the sender.
+    // Last resort: the two things Outlook always knows about the sender.
     console.warn('Using basic mailbox profile for signature', e);
     return { displayName: mailboxUser.displayName, mail: mailboxUser.emailAddress };
   }
@@ -125,38 +121,22 @@ function officeCall(fn) {
   });
 }
 
-async function getVariant(item) {
-  if (item.itemType === Office.MailboxEnums.ItemType.Appointment) return 'reply';
-  try {
-    const value = await officeCall((cb) => item.getComposeTypeAsync(cb));
-    return value.composeType === 'newMail' ? 'new' : 'reply';
-  } catch (e) {
-    return 'new';
-  }
-}
-
-async function applySignature(refresh) {
+async function applySignature() {
   const item = Office.context.mailbox.item;
-  const [template, profile, variant] = await Promise.all([loadTemplate(refresh), loadProfile(refresh), getVariant(item)]);
-  const html = SignatureRenderer.renderSignature(template, profile, { variant });
-  // Stop Outlook adding the user's own signature on top of ours.
+  const [{ config: signatureConfig, designs }, profile] = await Promise.all([loadDesigns(), loadProfile()]);
+  const { html } = SignatureRenderer.renderSignature(signatureConfig, designs, profile, config.baseUrl + '/assets');
+  // Stop Outlook adding the person's own signature as well as ours.
   if (item.disableClientSignatureAsync) {
     await officeCall((cb) => item.disableClientSignatureAsync(cb)).catch((e) => console.warn(e));
   }
   await officeCall((cb) => item.body.setSignatureAsync(html, { coercionType: Office.CoercionType.Html }, cb));
 }
 
-function makeHandler(refresh) {
-  return (event) => {
-    applySignature(refresh)
-      .catch((e) => console.error('Signature could not be applied', e))
-      .finally(() => event.completed());
-  };
+function onNewMessageComposeHandler(event) {
+  applySignature()
+    .catch((e) => console.error('Signature could not be applied', e))
+    .finally(() => event.completed());
 }
 
 Office.onReady(() => {});
-Office.actions.associate('onNewMessageComposeHandler', makeHandler(false));
-Office.actions.associate('onNewAppointmentComposeHandler', makeHandler(false));
-// Ribbon button: re-applies the signature with fresh data, e.g. after a
-// profile change in Entra ID.
-Office.actions.associate('insertSignature', makeHandler(true));
+Office.actions.associate('onNewMessageComposeHandler', onNewMessageComposeHandler);

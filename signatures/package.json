@@ -2,7 +2,7 @@
   "name": "signature-manager",
   "private": true,
   "version": "1.0.0",
-  "description": "Centrally managed Outlook email signatures driven by Microsoft 365 / Entra ID profile data",
+  "description": "Water Babies Outlook email signature, filled from Microsoft 365 profiles",
   "scripts": {
     "build": "node build.mjs",
     "test": "node --test test/*.test.js"

@@ -4,7 +4,7 @@ permalink: /blog/:year/:month/:day/:title
 # Google Analytics
 google_analytics: UA-134678958-1
 
-# Signature Manager: publish only the built app, not its sources or tooling.
+# Signature app: publish only what Outlook and the preview page need.
 exclude:
   - Gemfile
   - Gemfile.lock

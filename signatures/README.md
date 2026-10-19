@@ -1,156 +1,131 @@
-# Signature Manager
+# Water Babies email signature
 
-An in-house replacement for Exclaimer / CodeTwo. It puts one standard email signature on every
-Water Babies mailbox and fills it in from each person's Microsoft 365 (Entra ID)
-profile. A change to the template, or to someone's job title in Entra ID, reaches Outlook
-automatically. Nobody edits their own signature.
+Puts the Water Babies signature on every email sent from Outlook, filled in from each person's
+Microsoft 365 profile. It replaces Exclaimer/CodeTwo for one job only: rolling out this signature.
+
+It works in classic Outlook for Windows, new Outlook, Outlook for Mac, Outlook on the web, and
+Outlook for iOS and Android. It covers new emails, replies and forwards.
 
 ## How it works
 
 ```
-                 Entra ID (name, job title, department, phones, address, extension attributes)
-                         │ Microsoft Graph
-        ┌────────────────┴──────────────────┐
-        ▼                                   ▼
- Outlook add-in (every user)          Admin console (IT / comms)
- addin/launchevent.js                 index.html
-  · runs on every new email,           · browse all staff, preview each signature
-    reply, forward and meeting         · edit brand / template, campaign banners
-  · reads the sender's /me profile     · flags people with missing profile data
-  · renders template.json              · exports template.json and per-user HTML
-  · inserts the signature, turns off           │
-    Outlook's own signature                    ▼
-        ▲                             deploy/Deploy-Signatures.ps1 (optional)
-        │ template.json                 · server-side push to Outlook on the web / new Outlook
-        └──── published on GitHub Pages
+Microsoft 365 profile ──► Outlook add-in ──► signature inserted when an email is started
+(name, job title,         (addin/)            (Outlook's own signature is switched off
+ phone, mobile)              ▲                 for that email)
+                             │
+              signatures.json + designs/*.html + assets/
+              (published on GitHub Pages)
 ```
 
-One renderer (`src/renderer.js`) is shared by the add-in, the admin console and the tests, so the
-preview is exactly what people send.
-
-| Feature you get from Exclaimer/CodeTwo | Here |
+| What you change | Where |
 |---|---|
-| Signature built from Microsoft 365 profile fields | `user.*` placeholders, with custom fields from extension attributes via `fieldMap` |
-| Lines hidden when a field is empty | `{{#user.mobilePhone}}…{{/user.mobilePhone}}` |
-| Different signature for replies/forwards | `replyHtml` |
-| Scheduled, department-targeted campaign banners | `campaigns` (start/end dates, departments, exclusions) |
-| Works in Outlook web, new Outlook, Mac, classic Windows | Event-based Outlook add-in, deployed centrally |
-| Signature appears in the sender's Sent Items | Yes: it's added in the client, not by a mail flow rule |
-| Data-quality report | "Download data gaps (CSV)" in the admin console |
+| Company name, number, address, switchboard, website | `signatures.json` > `company` |
+| The design | `designs/standard.html` |
+| Logo and icons | `assets/` |
+| Someone's name, job title or numbers | Their Microsoft 365 profile (Entra ID) |
 
-## Files
+The design follows the *Water Babies Email Signature 2026* guide: 500px wide, three columns,
+Arial, brand blue `#0070C0`, cyan `#00B0F0`, orange `#FF6600` and panel `#E5F4F8`. It is built
+from tables and inline styles because that's what renders consistently in Outlook for Windows,
+which uses Word to display email, and in mobile apps. The logo is the blue version on white with
+one "W" width of clear space, as the brand guidelines require. The starfish, splash and anchor
+icons are the ones from the guide.
 
-| Path | What it is |
-|---|---|
-| `template.json` | **The live signature.** Brand settings, HTML template, reply template, campaigns. |
-| `index.html`, `admin.css`, `dist/admin.js` | Admin console |
-| `addin/manifest.xml` | Outlook add-in manifest to upload in the Microsoft 365 admin center |
-| `addin/commands.html`, `addin/launchevent.js` | Add-in runtime (built) |
-| `deploy/Deploy-Signatures.ps1` | Optional server-side push via Exchange Online PowerShell |
-| `src/` | Sources: renderer, add-in, admin console, `config.js` |
-| `assets/` | `logo.png` and `icons.png` (starfish, splash, anchor) are **cut from a screenshot and low resolution**: replace them with the original artwork at twice the display size (logo 300 px wide, icons 280 px wide), keeping the same file names. `banner.png` and the add-in icons are placeholders. |
-| `test/` | `npm test`: renderer tests, plus the built add-in run against a fake Outlook |
+Rules applied to everyone:
+- **T:** is their own office number from Microsoft 365, or the 0330 223 6777 switchboard if they
+  don't have one.
+- **M:** only appears for people who have a mobile in Microsoft 365.
 
-## Setup (one-off, about 30 minutes)
+## Preview a change
 
-### 1. Register the app in Entra ID
+Open `https://danbrimmicombe.co.uk/signatures/` (or run `npx serve` in this folder locally). It
+shows the signature exactly as Outlook will insert it, and you can type any name, title or
+numbers to test with. **Copy signature** lets you paste it into a real Outlook email.
+
+## Changing or adding designs
+
+- **Change the design:** edit `designs/standard.html`, check it in the preview, commit. Outlook
+  picks it up within an hour (`cacheMinutes` in `src/config.js`).
+- **Add another design**, for example for franchisees or another country:
+  1. Copy `designs/standard.html` to `designs/franchise.html` and edit it.
+  2. List it in `signatures.json`, and add a rule saying who gets it. The first matching rule wins.
+     Everyone else gets `defaultDesign`.
+
+     ```json
+     "rules": [
+       { "design": "franchise", "when": { "department": ["Franchise Support"] } }
+     ],
+     "designs": {
+       "standard": "designs/standard.html",
+       "franchise": "designs/franchise.html"
+     }
+     ```
+
+     Rules can match `department`, `officeLocation`, `companyName` or `email`.
+- **Switch to a new design for everyone:** point `defaultDesign` at it.
+
+Placeholders available in designs: `{{user.displayName}}`, `{{user.jobTitle}}`,
+`{{user.phone}}`, `{{user.phoneHref}}`, `{{user.mobilePhone}}`, `{{user.mobilePhoneHref}}`,
+`{{user.email}}`, every `{{company.*}}` value, and `{{assets}}` for image URLs. Wrap a line in
+`{{#user.mobilePhone}}…{{/user.mobilePhone}}` to drop it when the field is empty.
+
+Run `npm test` after any change. It checks every design for leftover placeholders, missing
+images, and images without a width and height (Outlook for Windows needs both).
+
+## One-off setup
+
+### 1. Register the app in Entra ID (5 minutes)
 
 Entra admin center > App registrations > New registration:
 
-- Name: `Signature Manager`. Supported account types: this organisation only.
-- **Authentication > Add a platform > Single-page application**, with these redirect URIs:
-  - `https://danbrimmicombe.co.uk/signatures/auth-redirect.html` (admin console)
-  - `brk-multihub://danbrimmicombe.co.uk` (the Outlook add-in's nested app authentication broker)
-- **API permissions** (Microsoft Graph, delegated): `User.Read` and `User.Read.All`.
-  Click **Grant admin consent**. The add-in can't show a sign-in prompt while it runs, so it
-  only works with tenant-wide consent.
-- Copy the **Application (client) ID** and the **Directory (tenant) ID**.
+- Name `Water Babies Signature`, single tenant.
+- **Authentication** > Add a platform > **Single-page application**, redirect URI
+  `brk-multihub://danbrimmicombe.co.uk`.
+- **API permissions:** Microsoft Graph > Delegated > `User.Read`, then **Grant admin consent**.
+  Each person's add-in can only read their own profile.
+- Copy the Application (client) ID and Directory (tenant) ID into `src/config.js`, then run:
 
-`User.Read.All` is only used when an admin signs in to the console. The add-in only asks for
-`User.Read`, so each person reads only their own profile.
+  ```sh
+  cd signatures && npm install && npm run build && npm test
+  ```
 
-### 2. Configure and build
+  Commit the rebuilt `addin/launchevent.js`.
 
-Edit `src/config.js` with the client ID, tenant ID and the URL the folder is published at. Then:
+### 2. Publish
 
-```sh
-cd signatures
-npm install
-npm run build
-npm test
-```
+The folder is served by GitHub Pages from the default branch. Keep **Enforce HTTPS** on.
 
-Commit the `dist/` and `addin/launchevent.js` output. GitHub Pages serves the built files as they
-are, with no build step on the server.
+If you'd rather host it on a Water Babies domain such as `signatures.waterbabies.co.uk`, change
+`baseUrl` in `src/config.js`, every URL in `addin/manifest.xml`, and the redirect URI.
 
-> **Hosting:** everything is currently addressed at `https://danbrimmicombe.co.uk/signatures`.
-> For production, consider an organisation-owned domain or repository, such as
-> `signatures.waterbabies.co.uk`. If you move it, update `baseUrl` in `src/config.js`, every
-> URL in `addin/manifest.xml`, `logoUrl`/`imageUrl` in `template.json` and the Entra redirect URIs.
-> Keep "Enforce HTTPS" on in the GitHub Pages settings, because Outlook refuses add-ins served
-> over plain HTTP.
+### 3. Roll out to Head Office first
 
-### 3. Fill in the profile data
-
-The signature only shows what Entra ID holds. Sign in to the admin console and click
-**Download data gaps (CSV)** to see who is missing a job title, phone number and so on. Fix the
-gaps in Entra ID or your HR sync. The office number defaults to the switchboard (0330 223 6777)
-when someone has none of their own; change `defaults` in `template.json` to alter that. Need a
-field Entra ID doesn't have, such as pronouns or a booking link? Store it in an Exchange custom
-attribute (`Set-Mailbox -CustomAttribute1 "she/her"`) and map it in `fieldMap`, for example
-`"pronouns": "onPremisesExtensionAttributes.extensionAttribute1"`. Then use `{{user.pronouns}}`
-in the template.
-
-### 4. Pilot, then roll out the add-in
-
-1. Microsoft 365 admin center > Settings > **Integrated apps** > Upload custom apps >
-   Office Add-in > upload `addin/manifest.xml`.
-2. Assign it to a **pilot group** first, for example IT plus a few people from each team.
-3. Deployment can take up to 24 hours (sometimes 72) to reach Outlook. In the pilot, check:
-   - [ ] Outlook on the web and new Outlook: new email, reply, forward, new meeting
-   - [ ] Classic Outlook for Windows (see "Known limitations")
+1. Create a group for the pilot. Either:
+   - an assigned **Microsoft 365 or security group**, "Signature - Head Office", with the Winslade
+     House staff added, or
+   - a **dynamic group** (needs Entra ID P1), e.g. `(user.officeLocation -eq "Winslade House")`.
+     Check the attribute is actually filled in first.
+2. Microsoft 365 admin center > Settings > **Integrated apps** > Upload custom apps > Office Add-in
+   > upload `addin/manifest.xml`, and assign it to **that group only**.
+3. Allow up to 24 hours (occasionally longer) for it to reach Outlook. Then check:
+   - [ ] Classic Outlook for Windows: new email, reply, forward
+   - [ ] New Outlook for Windows / Outlook on the web
    - [ ] Outlook for Mac
-   - [ ] Signatures from a person with no mobile, no job title or a long job title look right
-   - [ ] Signatures received in Gmail and on a phone render properly
-4. Assign to everyone, then remove Exclaimer/CodeTwo and ask staff to delete their old personal
-   signatures, or leave them: the add-in turns off Outlook's own signature on each message it handles.
+   - [ ] Outlook for iOS and Android (new email, reply)
+   - [ ] Someone with a mobile, someone without, and someone with a long job title
+   - [ ] What recipients see in Outlook, Gmail and the iPhone Mail app, including dark mode
+4. Ask pilot users to delete their old personal signature. The add-in switches it off per email
+   anyway, but a clean slate avoids confusion.
+5. Once happy, change the add-in's assignment in Integrated apps from the group to everyone.
+   Remove Exclaimer/CodeTwo at the same time, so nobody ends up with two signatures.
 
-Optional, for the switchover day: export from the console and run
-`deploy/Deploy-Signatures.ps1 -ExportPath signatures-export.json -WhatIf`, then without `-WhatIf`.
-This sets the signature server-side for Outlook on the web, but only while roaming signatures are
-postponed for the tenant (`Set-OrganizationConfig -PostponeRoamingSignaturesUntilLater $true`).
-The script warns you if they aren't.
+## Known limitations
 
-## Day-to-day
-
-- **Change the design or wording:** open the console, edit, check a few people in the preview,
-  click **Download template.json** and commit it over `signatures/template.json`. Clients pick it up
-  within `cacheMinutes` (60 by default), or straight away with the **Refresh signature** button on
-  the compose ribbon.
-- **Someone's details change:** update them in Entra ID. Their next email picks the change up once
-  the cache expires.
-- **Run a campaign banner:** add an entry to `campaigns` with `enabled: true`, `start`, `end`, and
-  optionally `departments`. Use the console's "As on" date to preview it. The first live campaign in
-  the list wins.
-- **New starter:** nothing to do. The add-in is assigned to everyone and reads their profile.
-
-Test the templates in real clients. Outlook for Windows renders HTML with Word: stick to tables,
-inline styles, PNG/JPG images at absolute HTTPS URLs (no SVG), and web-safe fonts.
-
-## Known limitations and risks
-
-- **Classic Outlook for Windows.** Event-based add-ins there run in a JavaScript-only runtime.
-  Microsoft says nested app authentication is generally available in classic Outlook, but it isn't
-  certain that it works inside that runtime. If it doesn't, the add-in still inserts a signature but
-  only has the sender's name and email (plus any `defaults`). **Check this first in the pilot.**
-  If it's a problem, the usual fix is an Intune/logon script that writes the rendered HTML into
-  `%APPDATA%\Microsoft\Signatures` for classic Outlook. The "Export all" output contains what that
-  script needs.
-- **Mobile.** Outlook for iOS/Android supports event-based add-ins only partially. Check the
-  mobile signature in the pilot.
-- **No server.** Everything runs in Outlook or the admin's browser, so there is nothing to patch or
-  pay for. The flip side is that `template.json` is public, so keep personal data out of it
-  (profile data is only ever fetched at send time).
-- **Mail sent from other devices or apps** (scanners, CRM, phones without the add-in) doesn't get
-  the signature. Exclaimer's server-side mode covers that. An Exchange transport-rule disclaimer is
-  the free fallback if you need it.
+- **Classic Outlook for Windows:** the add-in signs in to read the person's profile using nested
+  app authentication. Microsoft says this is supported in classic Outlook, but the pilot is
+  where to confirm it. If it fails, the signature still goes in, with only the person's name.
+  Check that job titles appear for pilot users on classic Outlook.
+- **Mobile:** Outlook for iOS/Android runs the add-in when an email is started, but the 500px
+  signature is scaled down to fit the phone screen, as the guide's own signature is today.
+- **Editing a draft** doesn't re-insert the signature (Outlook doesn't fire the event for drafts).
+- **Email sent from outside Outlook** (CRM, scanners, other mail apps) won't get the signature.

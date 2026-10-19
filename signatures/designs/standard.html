@@ -1,0 +1,38 @@
+<!--
+  Water Babies standard signature, based on the "Water Babies Email Signature 2026" guide:
+  500px wide, three columns (120 / 200 / 180), Arial, brand colours
+  blue #0070C0, cyan #00B0F0, orange #FF6600, panel #E5F4F8.
+  Built from tables, <p> margins and inline styles only, so it renders the
+  same in classic Outlook (Word engine), new Outlook, Outlook on the web,
+  Outlook mobile, Apple Mail and Gmail. Every image has width and height set.
+  Comments like this one are removed before the signature is inserted.
+-->
+<table border="0" cellpadding="0" cellspacing="0" width="500" role="presentation" style="border-collapse:collapse;border-spacing:0;mso-table-lspace:0pt;mso-table-rspace:0pt;width:500px;">
+  <tr>
+    <td width="120" style="width:120px;height:8px;padding:0;font-size:1px;line-height:1px;">&nbsp;</td>
+    <td width="200" style="width:200px;height:8px;padding:0;font-size:1px;line-height:1px;">&nbsp;</td>
+    <td width="180" bgcolor="#E5F4F8" style="width:180px;height:8px;padding:0;background-color:#E5F4F8;font-size:1px;line-height:1px;">&nbsp;</td>
+  </tr>
+  <tr>
+    <td width="120" valign="top" style="width:120px;padding:4px 8px;vertical-align:top;">
+      <a href="{{company.website}}" target="_blank" style="text-decoration:none;"><img src="{{assets}}/logo.png" alt="Water Babies - learn for life" width="104" height="74" style="display:block;width:104px;height:74px;border:0;"></a>
+    </td>
+    <td width="200" valign="top" style="width:200px;padding:4px 8px;vertical-align:top;">
+      <p style="margin:6px 0 2px 0;padding:0;font-family:Arial,Helvetica,sans-serif;font-size:14pt;line-height:16pt;mso-line-height-rule:exactly;color:#0070C0;"><strong>{{user.displayName}}</strong></p>
+      {{#user.jobTitle}}<p style="margin:0;padding:0;font-family:Arial,Helvetica,sans-serif;font-size:10pt;line-height:14pt;mso-line-height-rule:exactly;color:#00B0F0;">{{user.jobTitle}}</p>{{/user.jobTitle}}
+    </td>
+    <td width="180" valign="top" align="center" bgcolor="#E5F4F8" style="width:180px;padding:4px 8px;vertical-align:top;background-color:#E5F4F8;text-align:center;">
+      {{#user.mobilePhone}}<p style="margin:4px 0 0 0;padding:0;font-family:Arial,Helvetica,sans-serif;font-size:9pt;line-height:14pt;mso-line-height-rule:exactly;text-align:center;"><strong><span style="color:#FF6600;">M</span><span style="color:#0070C0;">:&nbsp;</span><a href="{{user.mobilePhoneHref}}" style="color:#0070C0;text-decoration:none;"><span style="color:#0070C0;">{{user.mobilePhone}}</span></a></strong></p>{{/user.mobilePhone}}
+      {{#user.phone}}<p style="margin:0;padding:0;font-family:Arial,Helvetica,sans-serif;font-size:9pt;line-height:14pt;mso-line-height-rule:exactly;text-align:center;"><strong><span style="color:#FF6600;">T</span><span style="color:#0070C0;">:&nbsp;</span><a href="{{user.phoneHref}}" style="color:#0070C0;text-decoration:none;"><span style="color:#0070C0;">{{user.phone}}</span></a></strong></p>{{/user.phone}}
+      <p style="margin:0;padding:0;font-family:Arial,Helvetica,sans-serif;font-size:9pt;line-height:14pt;mso-line-height-rule:exactly;text-align:center;"><strong><a href="{{company.website}}" target="_blank" style="color:#FF6600;text-decoration:underline;"><span style="color:#FF6600;">{{company.websiteLabel}}</span></a></strong></p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" valign="bottom" style="padding:2px 8px 4px 8px;vertical-align:bottom;">
+      <p style="margin:0;padding:0;font-family:Arial,Helvetica,sans-serif;font-size:7pt;line-height:9pt;mso-line-height-rule:exactly;color:#00B0F0;">{{company.name}}, {{company.addressLine1}},<br>{{company.addressLine2}}<br>Registered in {{company.registeredIn}} No. {{company.number}}</p>
+    </td>
+    <td valign="bottom" align="center" bgcolor="#E5F4F8" style="padding:2px 8px 6px 8px;vertical-align:bottom;background-color:#E5F4F8;text-align:center;">
+      <img src="{{assets}}/icon-star.png" alt="" width="26" height="26" style="width:26px;height:26px;border:0;">&nbsp;<img src="{{assets}}/icon-splash.png" alt="" width="26" height="26" style="width:26px;height:26px;border:0;">&nbsp;<img src="{{assets}}/icon-anchor.png" alt="" width="26" height="26" style="width:26px;height:26px;border:0;">
+    </td>
+  </tr>
+</table>

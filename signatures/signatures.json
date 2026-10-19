@@ -1,0 +1,17 @@
+{
+  "company": {
+    "name": "Water Babies Ltd",
+    "number": "04322357",
+    "registeredIn": "England & Wales",
+    "addressLine1": "Winslade House, Winslade Park, Manor Drive",
+    "addressLine2": "Clyst St Mary, Exeter, EX5 1FY",
+    "phone": "0330 223 6777",
+    "website": "https://www.waterbabies.co.uk",
+    "websiteLabel": "waterbabies.co.uk"
+  },
+  "defaultDesign": "standard",
+  "rules": [],
+  "designs": {
+    "standard": "designs/standard.html"
+  }
+}

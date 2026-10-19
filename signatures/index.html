@@ -3,69 +3,52 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Signature Manager</title>
-  <link rel="stylesheet" href="admin.css">
+  <title>Signature Preview</title>
+  <style>
+    :root { --bg: #f4f7f9; --panel: #fff; --text: #1d1d1f; --muted: #6e6e73; --border: #d6dde2; --accent: #0070c0; }
+    @media (prefers-color-scheme: dark) {
+      :root { --bg: #15181b; --panel: #1f2327; --text: #f1f3f5; --muted: #a3abb3; --border: #363d44; --accent: #4fb3f0; }
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 24px 16px; font: 14px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); }
+    main { max-width: 760px; margin: 0 auto; display: grid; gap: 16px; }
+    h1 { font-size: 20px; margin: 0; }
+    p { margin: 0; color: var(--muted); }
+    .panel { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+    .fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
+    label { display: grid; gap: 4px; font-size: 12px; color: var(--muted); }
+    input, select, textarea { font: inherit; color: var(--text); background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 6px 8px; width: 100%; }
+    iframe { width: 100%; height: 220px; border: 1px solid var(--border); border-radius: 6px; background: #fff; }
+    button { font: inherit; padding: 6px 14px; border-radius: 6px; border: 0; background: var(--accent); color: #fff; cursor: pointer; }
+    .row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+    textarea { font: 12px ui-monospace, Consolas, monospace; margin-top: 8px; }
+  </style>
 </head>
 <body>
-  <header class="topbar">
-    <h1>Signature Manager</h1>
-    <div class="actions">
-      <button id="reload" type="button" hidden>Reload staff</button>
-      <button id="signin" type="button" class="primary">Sign in with Microsoft 365</button>
+  <main>
+    <div>
+      <h1>Water Babies signature preview</h1>
+      <p>Shows the signature exactly as the Outlook add-in inserts it. Type any details to check how it copes with long titles or missing numbers.</p>
     </div>
-  </header>
-  <p id="status" class="status" role="status"></p>
-
-  <main class="layout">
-    <section class="panel people" aria-labelledby="people-heading">
-      <h2 id="people-heading">People</h2>
-      <input id="search" type="search" placeholder="Search name, team or job title" aria-label="Search people">
-      <p id="user-count" class="note"></p>
-      <ul id="user-list" class="user-list"></ul>
-    </section>
-
-    <section class="panel preview-panel" aria-labelledby="preview-heading">
-      <div class="panel-head">
-        <h2 id="preview-heading">Preview</h2>
-        <label>Compose
-          <select id="variant">
-            <option value="new">New email</option>
-            <option value="reply">Reply / forward / meeting</option>
-          </select>
-        </label>
-        <label>As on <input id="preview-date" type="date"></label>
-      </div>
+    <div class="panel fields">
+      <label>Design <select id="design"></select></label>
+      <label>Name <input id="name" value="Dan Brimmicombe"></label>
+      <label>Job title <input id="title" value="Associate Director of Technology"></label>
+      <label>Office phone <input id="phone" placeholder="switchboard"></label>
+      <label>Mobile <input id="mobile" placeholder="none"></label>
+    </div>
+    <div class="panel">
       <iframe id="preview" title="Signature preview" sandbox=""></iframe>
-      <p id="missing" class="note"></p>
-      <div class="actions">
+      <div class="row">
         <button id="copy" type="button">Copy signature</button>
-        <button id="export-all" type="button">Export all (for PowerShell push)</button>
-        <button id="export-gaps" type="button">Download data gaps (CSV)</button>
+        <span id="status" role="status"></span>
       </div>
       <details>
-        <summary>Rendered HTML</summary>
-        <textarea id="html-output" readonly rows="8" aria-label="Rendered HTML"></textarea>
+        <summary>HTML</summary>
+        <textarea id="html" rows="6" readonly aria-label="Signature HTML"></textarea>
       </details>
-    </section>
-
-    <section class="panel editor" aria-labelledby="editor-heading">
-      <div class="panel-head">
-        <h2 id="editor-heading">Template</h2>
-        <button id="download-template" type="button" class="primary">Download template.json</button>
-      </div>
-      <p class="note">Changes preview instantly. To roll out, download template.json and commit it to the
-        <code>signatures</code> folder &mdash; every Outlook client picks it up within the cache window.</p>
-      <h3>Brand</h3>
-      <div id="brand-form" class="brand-form"></div>
-      <h3>Full template (JSON)</h3>
-      <p class="note">Placeholders: <code>{{user.displayName}}</code>, <code>{{user.jobTitle}}</code>,
-        <code>{{user.department}}</code>, <code>{{user.phone}}</code>, <code>{{user.mobilePhone}}</code>,
-        <code>{{user.email}}</code>, <code>{{user.officeLocation}}</code>, plus
-        <code>{{#field}}…{{/field}}</code> to hide a line when the field is empty.</p>
-      <p id="template-error" class="error" role="alert"></p>
-      <textarea id="template-json" rows="24" spellcheck="false" aria-label="Template JSON"></textarea>
-    </section>
+    </div>
   </main>
-  <script src="dist/admin.js"></script>
+  <script src="preview.js"></script>
 </body>
 </html>
