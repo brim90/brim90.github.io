@@ -14,21 +14,20 @@ const GRAPH_USERS = 'https://graph.microsoft.com/v1.0/users?$top=999&$filter=acc
 const SAMPLE_USERS = [
   {
     id: 'sample-1', displayName: 'Alex Morgan', givenName: 'Alex', surname: 'Morgan',
-    jobTitle: 'Head of Fundraising', department: 'Fundraising', companyName: "Children's Alliance",
-    businessPhones: ['+44 20 7123 4567'], mobilePhone: '+44 7700 900123',
-    mail: 'alex.morgan@childrensalliance.org.uk', streetAddress: '1 Example Street', city: 'London', postalCode: 'EC1A 1AA',
-    onPremisesExtensionAttributes: { extensionAttribute1: 'they/them' }
+    jobTitle: 'Head of Swim Programmes', department: 'Operations', companyName: 'Water Babies',
+    businessPhones: ['0330 223 6777'], mobilePhone: '07700 900123',
+    mail: 'alex.morgan@waterbabies.co.uk', onPremisesExtensionAttributes: {}
   },
   {
     id: 'sample-2', displayName: 'Sam Patel', givenName: 'Sam', surname: 'Patel',
-    jobTitle: 'Programme Officer', department: 'Programmes',
-    businessPhones: [], mobilePhone: '', mail: 'sam.patel@childrensalliance.org.uk',
+    jobTitle: 'Franchise Support Manager, UK & EU', department: 'Franchise Support',
+    businessPhones: [], mobilePhone: '07700 900456', mail: 'sam.patel@waterbabies.co.uk',
     onPremisesExtensionAttributes: {}
   },
   {
     id: 'sample-3', displayName: 'Jordan Lee', givenName: 'Jordan', surname: 'Lee',
-    jobTitle: '', department: 'Finance', businessPhones: ['020 7123 4500'],
-    mail: 'jordan.lee@childrensalliance.org.uk', onPremisesExtensionAttributes: {}
+    jobTitle: '', department: 'Finance', businessPhones: [],
+    mail: 'jordan.lee@waterbabies.co.uk', onPremisesExtensionAttributes: {}
   }
 ];
 

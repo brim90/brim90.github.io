@@ -1,7 +1,7 @@
 # Signature Manager
 
 An in-house replacement for Exclaimer / CodeTwo. It puts one standard email signature on every
-Children's Alliance mailbox and fills it in from each person's Microsoft 365 (Entra ID)
+Water Babies mailbox and fills it in from each person's Microsoft 365 (Entra ID)
 profile. A change to the template, or to someone's job title in Entra ID, reaches Outlook
 automatically. Nobody edits their own signature.
 
@@ -48,7 +48,7 @@ preview is exactly what people send.
 | `addin/commands.html`, `addin/launchevent.js` | Add-in runtime (built) |
 | `deploy/Deploy-Signatures.ps1` | Optional server-side push via Exchange Online PowerShell |
 | `src/` | Sources: renderer, add-in, admin console, `config.js` |
-| `assets/` | Logo, banner and add-in icons (**placeholders**, replace with real artwork) |
+| `assets/` | `logo.png` and `icons.png` (starfish, splash, anchor) are **cut from a screenshot and low resolution**: replace them with the original artwork at twice the display size (logo 300 px wide, icons 280 px wide), keeping the same file names. `banner.png` and the add-in icons are placeholders. |
 | `test/` | `npm test`: renderer tests, plus the built add-in run against a fake Outlook |
 
 ## Setup (one-off, about 30 minutes)
@@ -85,7 +85,7 @@ are, with no build step on the server.
 
 > **Hosting:** everything is currently addressed at `https://danbrimmicombe.co.uk/signatures`.
 > For production, consider an organisation-owned domain or repository, such as
-> `signatures.childrensalliance.org.uk`. If you move it, update `baseUrl` in `src/config.js`, every
+> `signatures.waterbabies.co.uk`. If you move it, update `baseUrl` in `src/config.js`, every
 > URL in `addin/manifest.xml`, `logoUrl`/`imageUrl` in `template.json` and the Entra redirect URIs.
 > Keep "Enforce HTTPS" on in the GitHub Pages settings, because Outlook refuses add-ins served
 > over plain HTTP.
@@ -94,9 +94,12 @@ are, with no build step on the server.
 
 The signature only shows what Entra ID holds. Sign in to the admin console and click
 **Download data gaps (CSV)** to see who is missing a job title, phone number and so on. Fix the
-gaps in Entra ID or your HR sync. Pronouns are read from `extensionAttribute1` by default: set them
-with `Set-Mailbox -CustomAttribute1 "she/her"` in Exchange Online, or change `fieldMap` in
-`template.json` to point at another attribute.
+gaps in Entra ID or your HR sync. The office number defaults to the switchboard (0330 223 6777)
+when someone has none of their own; change `defaults` in `template.json` to alter that. Need a
+field Entra ID doesn't have, such as pronouns or a booking link? Store it in an Exchange custom
+attribute (`Set-Mailbox -CustomAttribute1 "she/her"`) and map it in `fieldMap`, for example
+`"pronouns": "onPremisesExtensionAttributes.extensionAttribute1"`. Then use `{{user.pronouns}}`
+in the template.
 
 ### 4. Pilot, then roll out the add-in
 
@@ -107,7 +110,7 @@ with `Set-Mailbox -CustomAttribute1 "she/her"` in Exchange Online, or change `fi
    - [ ] Outlook on the web and new Outlook: new email, reply, forward, new meeting
    - [ ] Classic Outlook for Windows (see "Known limitations")
    - [ ] Outlook for Mac
-   - [ ] Signatures from a person with no mobile, no job title or pronouns look right
+   - [ ] Signatures from a person with no mobile, no job title or a long job title look right
    - [ ] Signatures received in Gmail and on a phone render properly
 4. Assign to everyone, then remove Exclaimer/CodeTwo and ask staff to delete their old personal
    signatures, or leave them: the add-in turns off Outlook's own signature on each message it handles.

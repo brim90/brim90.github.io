@@ -27,7 +27,7 @@
     .\Deploy-Signatures.ps1 -ExportPath .\signatures-export.json -WhatIf
 
 .EXAMPLE
-    .\Deploy-Signatures.ps1 -ExportPath .\signatures-export.json -Only alex.morgan@childrensalliance.org.uk
+    .\Deploy-Signatures.ps1 -ExportPath .\signatures-export.json -Only alex.morgan@waterbabies.co.uk
 #>
 [CmdletBinding(SupportsShouldProcess)]
 param(

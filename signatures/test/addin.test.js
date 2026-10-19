@@ -8,7 +8,7 @@ const vm = require('node:vm');
 
 const bundle = fs.readFileSync(path.join(__dirname, '..', 'addin', 'launchevent.js'), 'utf8');
 const template = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'template.json'), 'utf8'));
-const legalHtml = require('../src/renderer').escapeHtml(template.brand.legal);
+const addressHtml = require('../src/renderer').escapeHtml(template.brand.address);
 
 function loadAddin({ composeType = 'newMail', itemType = 'message', graph = null, templateOk = true } = {}) {
   const handlers = {};
@@ -27,7 +27,7 @@ function loadAddin({ composeType = 'newMail', itemType = 'message', graph = null
     MailboxEnums: { ItemType: { Message: 'message', Appointment: 'appointment' } },
     onReady: () => Promise.resolve(),
     actions: { associate: (name, fn) => { handlers[name] = fn; } },
-    context: { mailbox: { item, userProfile: { displayName: 'Alex Morgan', emailAddress: 'Alex.Morgan@childrensalliance.org.uk' } } }
+    context: { mailbox: { item, userProfile: { displayName: 'Alex Morgan', emailAddress: 'Alex.Morgan@waterbabies.co.uk' } } }
   };
   const fetch = async (url) => {
     calls.fetches.push(url);
@@ -57,13 +57,13 @@ test('new email gets the full signature and Outlook signature is disabled', asyn
   assert.strictEqual(calls.signature.opts.coercionType, 'html');
   // Graph is unavailable here, so it falls back to the mailbox profile.
   assert.ok(calls.signature.html.includes('Alex Morgan'));
-  assert.ok(calls.signature.html.includes(legalHtml));
+  assert.ok(calls.signature.html.includes(addressHtml));
 });
 
 test('reply gets the short signature', async () => {
   const { run, calls } = loadAddin({ composeType: 'reply' });
   await run('onNewMessageComposeHandler');
-  assert.ok(!calls.signature.html.includes(legalHtml));
+  assert.ok(!calls.signature.html.includes(addressHtml));
 });
 
 test('event always completes even if the template cannot load', async () => {

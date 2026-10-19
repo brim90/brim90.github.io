@@ -12,10 +12,10 @@
            xsi:type="MailApp">
   <Id>07de1f9c-bfe4-43c7-8a9f-395c406d7f07</Id>
   <Version>1.0.0.0</Version>
-  <ProviderName>Children's Alliance</ProviderName>
+  <ProviderName>Water Babies</ProviderName>
   <DefaultLocale>en-GB</DefaultLocale>
-  <DisplayName DefaultValue="Children's Alliance Signature"/>
-  <Description DefaultValue="Adds the standard Children's Alliance email signature, filled in from your Microsoft 365 profile."/>
+  <DisplayName DefaultValue="Water Babies Signature"/>
+  <Description DefaultValue="Adds the standard Water Babies email signature, filled in from your Microsoft 365 profile."/>
   <IconUrl DefaultValue="https://danbrimmicombe.co.uk/signatures/assets/icon-64.png"/>
   <HighResolutionIconUrl DefaultValue="https://danbrimmicombe.co.uk/signatures/assets/icon-128.png"/>
   <SupportUrl DefaultValue="https://danbrimmicombe.co.uk/signatures/"/>
@@ -135,7 +135,7 @@
           <bt:String id="Button.Label" DefaultValue="Refresh signature"/>
         </bt:ShortStrings>
         <bt:LongStrings>
-          <bt:String id="Button.Tooltip" DefaultValue="Re-insert the Children's Alliance signature with your latest Microsoft 365 details."/>
+          <bt:String id="Button.Tooltip" DefaultValue="Re-insert the Water Babies signature with your latest Microsoft 365 details."/>
         </bt:LongStrings>
       </Resources>
     </VersionOverrides>
