@@ -104,7 +104,7 @@ Entra admin center > App registrations > New registration:
 - Copy the Application (client) ID and Directory (tenant) ID into `src/config.js`, then run:
 
   ```sh
-  cd signatures && npm install && npm run build && npm test
+  npm install && npm run build && npm test
   ```
 
   Commit the rebuilt `addin/launchevent.js`.
@@ -114,16 +114,29 @@ Entra admin center > App registrations > New registration:
 Everything is served from `https://signatures.waterbabies.co.uk`. Images and links on the
 sender's own domain matter for delivery: spam filters treat a mismatch as a phishing signal.
 
-1. Put the contents of this folder at the root of its own GitHub repository. `CNAME` and
-   `.nojekyll` are already here.
-2. In the repository, go to Settings > Pages > Deploy from a branch > `main`, folder `/ (root)`,
-   with custom domain `signatures.waterbabies.co.uk`.
-3. DNS for waterbabies.co.uk: add a `CNAME` record for `signatures` pointing to
-   `<github-owner>.github.io` (the account or organisation that owns the repository).
-4. Recommended: verify the domain in GitHub (owner Settings > Pages > Add a verified domain, then
-   add the TXT record it gives you). This stops anyone else's GitHub site claiming
-   `*.waterbabies.co.uk`.
-5. Once the certificate is issued (usually within an hour), tick **Enforce HTTPS**.
+The site is the `brim90/waterbabies-signatures` repository, published with GitHub Pages.
+
+1. **GitHub:** in the repository, go to Settings > Pages > Build and deployment > Source
+   **Deploy from a branch**, branch `main`, folder `/ (root)`, then Save. The custom domain
+   `signatures.waterbabies.co.uk` is picked up from the `CNAME` file. If it isn't, type it in.
+2. **Cloudflare** (waterbabies.co.uk > DNS > Records > Add record):
+
+   | Type | Name | Target | Proxy status | TTL |
+   |---|---|---|---|---|
+   | CNAME | `signatures` | `brim90.github.io` | **DNS only** (grey cloud) | Auto |
+
+   Keep it **DNS only**. With the orange-cloud proxy on, GitHub can't issue the site's HTTPS
+   certificate and can't tell the domain is pointing at it.
+3. **Recommended, domain verification:** GitHub > your profile Settings > Pages > **Add a
+   domain** > `waterbabies.co.uk`. GitHub shows a TXT record. Add it in Cloudflare exactly as
+   shown (Type `TXT`, Name `_github-pages-challenge-brim90`, Content the code GitHub gives you),
+   then click Verify. This stops anyone else's GitHub site claiming a waterbabies.co.uk address.
+4. **If Cloudflare has CAA records** for waterbabies.co.uk (DNS > Records, type CAA), add one
+   allowing `letsencrypt.org`, or GitHub can't issue the certificate. If there are no CAA
+   records, nothing to do.
+5. Back in Settings > Pages, wait for "DNS check successful" and the certificate (usually under
+   an hour), then tick **Enforce HTTPS**. Check `https://signatures.waterbabies.co.uk/` loads the
+   preview page.
 
 To host it somewhere else, change `baseUrl` in `src/config.js` and run `npm run build`. The build
 regenerates `addin/manifest.xml` with the new URLs. Update the Entra redirect URI to match.
