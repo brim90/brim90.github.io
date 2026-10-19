@@ -22,7 +22,7 @@ Microsoft 365 profile ──► Outlook add-in ──► signature inserted when
 |---|---|
 | Company name, number, address, switchboard, website | `signatures.json` > `company` |
 | The design | `designs/standard.html` (new emails) and `designs/standard-reply.html` (replies and forwards) |
-| Logo and icons | `assets/` |
+| Logo and icons | `assets/logo.png` (208×148, shown at 104×74) and `assets/icons.png` (188×52, shown at 94×26). Replace them with same-size exports, keeping the file names. |
 | Someone's name, job title or numbers | Their Microsoft 365 profile (Entra ID) |
 
 The design follows the *Water Babies Email Signature 2026* guide: 500px wide, three columns,
@@ -32,6 +32,18 @@ which uses Word to display email, and in mobile apps. The logo is the blue versi
 one "W" width of clear space, as the brand guidelines require. The starfish, splash and anchor
 icons are the ones from the guide.
 
+Where it deliberately differs from the guide, for better display and delivery:
+- **Hosted images, not embedded ones.** Gmail strips embedded images and Outlook turns them into
+  attachments (paperclip icons, higher spam scores).
+- **Two images instead of four.** The three icons are one strip, so there are fewer requests,
+  fewer "download pictures?" placeholders and a better image-to-text ratio.
+- **Double-resolution logo,** so it's sharp on phones and modern laptops.
+  **The icons are still 1x:** the guide only has them at 26px. Swap in a 2x export from
+  marketing's originals when you get them.
+- **Readable legal text:** 7pt in brand blue instead of 4.5pt cyan, with the company number and
+  registered office (a legal requirement for UK company emails).
+- **An underlined website link.**
+
 Rules applied to everyone:
 - **T:** is their own office number from Microsoft 365, or the 0330 223 6777 switchboard if they
   don't have one.
@@ -39,7 +51,7 @@ Rules applied to everyone:
 
 ## Preview a change
 
-Open `https://danbrimmicombe.co.uk/signatures/` (or run `npx serve` in this folder locally). It
+Open `https://signatures.waterbabies.co.uk/` (or run `npx serve` in this folder locally). It
 shows the signature exactly as Outlook will insert it, and you can type any name, title or
 numbers to test with. **Copy signature** lets you paste it into a real Outlook email.
 
@@ -83,7 +95,7 @@ Entra admin center > App registrations > New registration:
 
 - Name `Water Babies Signature`, single tenant.
 - **Authentication** > Add a platform > **Single-page application**, redirect URI
-  `brk-multihub://danbrimmicombe.co.uk`.
+  `brk-multihub://signatures.waterbabies.co.uk`.
 - **API permissions:** Microsoft Graph > Delegated > `User.Read`, then **Grant admin consent**.
   Each person's add-in can only read their own profile.
 - Copy the Application (client) ID and Directory (tenant) ID into `src/config.js`, then run:
@@ -96,10 +108,23 @@ Entra admin center > App registrations > New registration:
 
 ### 2. Publish
 
-The folder is served by GitHub Pages from the default branch. Keep **Enforce HTTPS** on.
+Everything is served from `https://signatures.waterbabies.co.uk`. Images and links on the
+sender's own domain matter for delivery: spam filters treat a mismatch as a phishing signal.
 
-If you'd rather host it on a Water Babies domain such as `signatures.waterbabies.co.uk`, change
-`baseUrl` in `src/config.js`, every URL in `addin/manifest.xml`, and the redirect URI.
+1. Put the contents of this folder at the root of its own GitHub repository. `CNAME` and
+   `.nojekyll` are already here.
+2. In the repository, go to Settings > Pages > Deploy from a branch > `main`, folder `/ (root)`,
+   with custom domain `signatures.waterbabies.co.uk`.
+3. DNS for waterbabies.co.uk: add a `CNAME` record for `signatures` pointing to
+   `<github-owner>.github.io` (the account or organisation that owns the repository).
+4. Recommended: verify the domain in GitHub (owner Settings > Pages > Add a verified domain, then
+   add the TXT record it gives you). This stops anyone else's GitHub site claiming
+   `*.waterbabies.co.uk`.
+5. Once the certificate is issued (usually within an hour), tick **Enforce HTTPS**.
+
+To host it somewhere else, change `baseUrl` in `src/config.js` and run `npm run build`. The build
+regenerates `addin/manifest.xml` with the new URLs. Update the Entra redirect URI to match.
+If Outlook already has the add-in, upload the new manifest in Integrated apps.
 
 ### 3. Roll out to Head Office first
 

@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Water Babies signature add-in.
-  Deploy in the Microsoft 365 admin center > Settings > Integrated apps > Upload custom apps,
-  assigned to the Head Office group first (see README).
-  If the signatures folder moves, replace every https://danbrimmicombe.co.uk/signatures URL below.
+  Water Babies signature add-in. Template for addin/manifest.xml: `npm run build`
+  fills in https://signatures.waterbabies.co.uk and https://signatures.waterbabies.co.uk from src/config.js. Upload the generated
+  addin/manifest.xml, not this file.
 -->
 <OfficeApp xmlns="http://schemas.microsoft.com/office/appforoffice/1.1"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -11,16 +10,16 @@
            xmlns:mailappor="http://schemas.microsoft.com/office/mailappversionoverrides/1.0"
            xsi:type="MailApp">
   <Id>07de1f9c-bfe4-43c7-8a9f-395c406d7f07</Id>
-  <Version>1.1.0.0</Version>
+  <Version>1.2.0.0</Version>
   <ProviderName>Water Babies Ltd</ProviderName>
   <DefaultLocale>en-GB</DefaultLocale>
   <DisplayName DefaultValue="Water Babies Signature"/>
   <Description DefaultValue="Adds the Water Babies email signature, filled in from your Microsoft 365 profile."/>
-  <IconUrl DefaultValue="https://danbrimmicombe.co.uk/signatures/assets/icon-64.png"/>
-  <HighResolutionIconUrl DefaultValue="https://danbrimmicombe.co.uk/signatures/assets/icon-128.png"/>
-  <SupportUrl DefaultValue="https://danbrimmicombe.co.uk/signatures/"/>
+  <IconUrl DefaultValue="https://signatures.waterbabies.co.uk/assets/icon-64.png"/>
+  <HighResolutionIconUrl DefaultValue="https://signatures.waterbabies.co.uk/assets/icon-128.png"/>
+  <SupportUrl DefaultValue="https://signatures.waterbabies.co.uk/"/>
   <AppDomains>
-    <AppDomain>https://danbrimmicombe.co.uk</AppDomain>
+    <AppDomain>https://signatures.waterbabies.co.uk</AppDomain>
     <AppDomain>https://login.microsoftonline.com</AppDomain>
   </AppDomains>
   <Hosts>
@@ -34,7 +33,7 @@
   <FormSettings>
     <Form xsi:type="ItemRead">
       <DesktopSettings>
-        <SourceLocation DefaultValue="https://danbrimmicombe.co.uk/signatures/addin/commands.html"/>
+        <SourceLocation DefaultValue="https://signatures.waterbabies.co.uk/addin/commands.html"/>
         <RequestedHeight>250</RequestedHeight>
       </DesktopSettings>
     </Form>
@@ -83,8 +82,8 @@
       </Hosts>
       <Resources>
         <bt:Urls>
-          <bt:Url id="WebViewRuntime.Url" DefaultValue="https://danbrimmicombe.co.uk/signatures/addin/commands.html"/>
-          <bt:Url id="JSRuntime.Url" DefaultValue="https://danbrimmicombe.co.uk/signatures/addin/launchevent.js"/>
+          <bt:Url id="WebViewRuntime.Url" DefaultValue="https://signatures.waterbabies.co.uk/addin/commands.html"/>
+          <bt:Url id="JSRuntime.Url" DefaultValue="https://signatures.waterbabies.co.uk/addin/launchevent.js"/>
         </bt:Urls>
       </Resources>
     </VersionOverrides>

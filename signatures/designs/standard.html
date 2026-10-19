@@ -2,6 +2,10 @@
   Water Babies standard signature, based on the "Water Babies Email Signature 2026" guide:
   500px wide, three columns (120 / 200 / 180), Arial, brand colours
   blue #0070C0, cyan #00B0F0, orange #FF6600, panel #E5F4F8.
+  Changes from the guide: images are hosted rather than embedded (embedded images
+  are stripped by Gmail and turned into attachments by Outlook), the logo is
+  2x resolution, the three icons are one image, and the small legal text is
+  blue rather than cyan so it stays readable.
   Built from tables, <p> margins and inline styles only, so it renders the
   same in classic Outlook (Word engine), new Outlook, Outlook on the web,
   Outlook mobile, Apple Mail and Gmail. Every image has width and height set.
@@ -29,10 +33,10 @@
   </tr>
   <tr>
     <td colspan="2" valign="bottom" style="padding:2px 8px 4px 8px;vertical-align:bottom;">
-      <p style="margin:0;padding:0;font-family:Arial,Helvetica,sans-serif;font-size:7pt;line-height:9pt;mso-line-height-rule:exactly;color:#00B0F0;">{{company.name}}. Registered in {{company.registeredIn}} No. {{company.number}}<br>Registered office: {{company.addressLine1}},<br>{{company.addressLine2}}</p>
+      <p style="margin:0;padding:0;font-family:Arial,Helvetica,sans-serif;font-size:7pt;line-height:9pt;mso-line-height-rule:exactly;color:#0070C0;">{{company.name}}. Registered in {{company.registeredIn}} No. {{company.number}}<br>Registered office: {{company.addressLine1}},<br>{{company.addressLine2}}</p>
     </td>
     <td valign="bottom" align="center" bgcolor="#E5F4F8" style="padding:2px 8px 6px 8px;vertical-align:bottom;background-color:#E5F4F8;text-align:center;">
-      <img src="{{assets}}/icon-star.png" alt="" width="26" height="26" style="width:26px;height:26px;border:0;">&nbsp;<img src="{{assets}}/icon-splash.png" alt="" width="26" height="26" style="width:26px;height:26px;border:0;">&nbsp;<img src="{{assets}}/icon-anchor.png" alt="" width="26" height="26" style="width:26px;height:26px;border:0;">
+      <img src="{{assets}}/icons.png" alt="" width="94" height="26" style="width:94px;height:26px;border:0;">
     </td>
   </tr>
 </table>

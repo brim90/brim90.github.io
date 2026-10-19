@@ -76,7 +76,7 @@ test('designs without a reply version use the full one', () => {
 
 test('every image has absolute src, width and height (needed by Outlook desktop)', () => {
   const imgs = render(dan).match(/<img [^>]*>/g);
-  assert.strictEqual(imgs.length, 4);
+  assert.strictEqual(imgs.length, 2, 'keep the image count low: logo and icon strip');
   for (const img of imgs) {
     assert.match(img, new RegExp('src="' + ASSETS + '/[\\w-]+\\.png"'));
     assert.match(img, / width="\d+"/);

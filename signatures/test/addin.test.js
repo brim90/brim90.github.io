@@ -8,6 +8,7 @@ const vm = require('node:vm');
 
 const root = path.join(__dirname, '..');
 const bundle = fs.readFileSync(path.join(root, 'addin', 'launchevent.js'), 'utf8');
+const { baseUrl } = require('../src/config');
 
 function loadAddin({ serverUp = true, mobile = false, composeType = 'newMail' } = {}) {
   const handlers = {};
@@ -31,7 +32,7 @@ function loadAddin({ serverUp = true, mobile = false, composeType = 'newMail' } 
   };
   const fetch = async (url) => {
     calls.fetches.push(url);
-    const file = url.replace(/^https:\/\/danbrimmicombe\.co\.uk\/signatures\//, '').replace(/\?.*$/, '');
+    const file = url.startsWith(baseUrl + '/') ? url.slice(baseUrl.length + 1).replace(/\?.*$/, '') : url;
     if (!serverUp || file === url) return { ok: false, status: 503 };
     const text = fs.readFileSync(path.join(root, file), 'utf8');
     return { ok: true, text: async () => text };
@@ -56,7 +57,7 @@ test('inserts the signature and turns off Outlook\'s own one', async () => {
   assert.strictEqual(calls.signature.opts.coercionType, 'html');
   // No Graph in the test, so it falls back to the mailbox name.
   assert.ok(calls.signature.html.includes('Dan Brimmicombe'));
-  assert.ok(calls.signature.html.includes('https://danbrimmicombe.co.uk/signatures/assets/logo.png'));
+  assert.ok(calls.signature.html.includes(baseUrl + '/assets/logo.png'));
 });
 
 test('replies and forwards get the short signature', async () => {
@@ -87,4 +88,15 @@ test('designs are cached between emails', async () => {
   await run();
   await run();
   assert.strictEqual(calls.fetches.filter((u) => u.includes('signatures.json')).length, 1);
+});
+
+test('generated manifest points at the configured site', () => {
+  const manifest = fs.readFileSync(path.join(root, 'addin', 'manifest.xml'), 'utf8');
+  assert.ok(!manifest.includes('{{'), 'run npm run build');
+  for (const url of manifest.match(/https:\/\/[^"<]+/g)) {
+    if (url.startsWith('https://login.microsoftonline.com')) continue;
+    assert.ok(url.startsWith(new URL(baseUrl).origin), url + ' is not on ' + baseUrl);
+  }
+  assert.match(manifest, /<LaunchEvent Type="OnNewMessageCompose"/);
+  assert.match(manifest, /<MobileFormFactor>/);
 });
